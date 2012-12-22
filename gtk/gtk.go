@@ -7204,8 +7204,11 @@ type GtkFrame struct {
 }
 
 func Frame(label string) *GtkFrame {
-	ptr := C.CString(label)
-	defer C.free_string(ptr)
+	var ptr *C.char
+	if len(label) > 0 {
+		ptr := C.CString(label)
+		defer C.free_string(ptr)
+	}
 	return &GtkFrame{GtkBin{GtkContainer{GtkWidget{
 		C.gtk_frame_new(C.to_gcharptr(ptr))}}}}
 }

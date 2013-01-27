@@ -25,7 +25,7 @@ static GdkWindow* to_GdkWindow(void* w) {
 }
 
 static void _g_thread_init(GThreadFunctions *vtable) {
-#ifdef	G_THREADS_ENABLED
+#if defined(G_THREADS_ENABLED) && (GTK_MAJOR_VERSION > 2 || GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 32)
 	g_thread_init(vtable);
 #endif
 }

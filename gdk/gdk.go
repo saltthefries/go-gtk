@@ -23,14 +23,8 @@ static void* _gdk_display_get_default() {
 static GdkWindow* to_GdkWindow(void* w) {
 	return GDK_WINDOW(w);
 }
-
-static void _g_thread_init(GThreadFunctions *vtable) {
-#if defined(G_THREADS_ENABLED) && (GTK_MAJOR_VERSION > 2 || GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 32)
-	g_thread_init(vtable);
-#endif
-}
 */
-// #cgo pkg-config: gdk-2.0 gthread-2.0
+// #cgo pkg-config: gdk-3.0
 import "C"
 import "unsafe"
 
@@ -67,25 +61,6 @@ func Beep() {
 
 func Flush() {
 	C.gdk_flush()
-}
-
-//-----------------------------------------------------------------------
-// Threads
-//-----------------------------------------------------------------------
-func ThreadsInit() {
-	if first {
-		first = false
-		C._g_thread_init(nil)
-	}
-	C.gdk_threads_init()
-}
-
-func ThreadsEnter() {
-	C.gdk_threads_enter()
-}
-
-func ThreadsLeave() {
-	C.gdk_threads_leave()
 }
 
 //-----------------------------------------------------------------------
@@ -214,152 +189,6 @@ func Color(name string) *GdkColor {
 }
 
 //-----------------------------------------------------------------------
-// GdkFont
-//-----------------------------------------------------------------------
-type GdkFont struct {
-	Font *C.GdkFont
-}
-
-func FontLoad(name string) *GdkFont {
-	ptr := C.CString(name)
-	defer C.free_string(ptr)
-	return &GdkFont{
-		C.gdk_font_load(C.to_gcharptr(ptr))}
-}
-
-func FontsetLoad(name string) *GdkFont {
-	ptr := C.CString(name)
-	defer C.free_string(ptr)
-	return &GdkFont{
-		C.gdk_fontset_load(C.to_gcharptr(ptr))}
-}
-
-// GdkFont* gdk_font_ref (GdkFont *font);
-// void gdk_font_unref (GdkFont *font);
-// gint gdk_font_id (const GdkFont *font);
-// gboolean gdk_font_equal (const GdkFont *fonta, const GdkFont *fontb);
-// GdkFont *gdk_font_load_for_display (GdkDisplay *display, const gchar *font_name);
-// GdkFont *gdk_fontset_load_for_display (GdkDisplay *display, const gchar *fontset_name);
-// GdkFont *gdk_font_from_description_for_display (GdkDisplay *display, PangoFontDescription *font_desc);
-// GdkFont* gdk_font_load (const gchar *font_name);
-// GdkFont* gdk_fontset_load (const gchar *fontset_name);
-// GdkFont* gdk_font_from_description (PangoFontDescription *font_desc);
-// gint gdk_string_width (GdkFont *font, const gchar *string);
-// gint gdk_text_width (GdkFont *font, const gchar *text, gint text_length);
-// gint gdk_text_width_wc (GdkFont *font, const GdkWChar *text, gint text_length);
-// gint gdk_char_width (GdkFont *font, gchar character);
-// gint gdk_char_width_wc (GdkFont *font, GdkWChar character);
-// gint gdk_string_measure (GdkFont *font, const gchar *string);
-// gint gdk_text_measure (GdkFont *font, const gchar *text, gint text_length);
-// gint gdk_char_measure (GdkFont *font, gchar character);
-// gint gdk_string_height (GdkFont *font, const gchar *string);
-// gint gdk_text_height (GdkFont *font, const gchar *text, gint text_length);
-// gint gdk_char_height (GdkFont *font, gchar character);
-// void gdk_text_extents (GdkFont *font, const gchar *text, gint text_length, gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent);
-// void gdk_text_extents_wc (GdkFont *font, const GdkWChar *text, gint text_length, gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent);
-// void gdk_string_extents (GdkFont *font, const gchar *string, gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent);
-// GdkDisplay * gdk_font_get_display (GdkFont *font);
-
-//-----------------------------------------------------------------------
-// GdkGC
-//-----------------------------------------------------------------------
-type GdkGC struct {
-	GC *C.GdkGC
-}
-
-func GC(drawable *GdkDrawable) *GdkGC {
-	return &GdkGC{
-		C.gdk_gc_new(drawable.Drawable)}
-}
-
-// GdkGC *gdk_gc_new_with_values (GdkDrawable *drawable, GdkGCValues *values, GdkGCValuesMask values_mask);
-// GdkGC *gdk_gc_ref (GdkGC *gc);
-// void gdk_gc_unref (GdkGC *gc);
-// void gdk_gc_get_values (GdkGC *gc, GdkGCValues *values);
-// void gdk_gc_set_values (GdkGC *gc, GdkGCValues *values, GdkGCValuesMask values_mask);
-func (v *GdkGC) SetForeground(color *GdkColor) {
-	C.gdk_gc_set_foreground(v.GC, &color.Color)
-}
-func (v *GdkGC) SetBackground(color *GdkColor) {
-	C.gdk_gc_set_background(v.GC, &color.Color)
-}
-// void gdk_gc_set_font (GdkGC *gc, GdkFont *font);
-// void gdk_gc_set_function (GdkGC *gc, GdkFunction function);
-// void gdk_gc_set_fill (GdkGC *gc, GdkFill fill);
-// void gdk_gc_set_tile (GdkGC *gc, GdkPixmap *tile);
-// void gdk_gc_set_stipple (GdkGC *gc, GdkPixmap *stipple);
-// void gdk_gc_set_ts_origin (GdkGC *gc, gint x, gint y);
-// void gdk_gc_set_clip_origin (GdkGC *gc, gint x, gint y);
-// void gdk_gc_set_clip_mask (GdkGC *gc, GdkBitmap *mask);
-// void gdk_gc_set_clip_rectangle (GdkGC *gc, const GdkRectangle *rectangle);
-// void gdk_gc_set_clip_region (GdkGC *gc, const GdkRegion *region);
-// void gdk_gc_set_subwindow (GdkGC *gc, GdkSubwindowMode mode);
-// void gdk_gc_set_exposures (GdkGC *gc, gboolean exposures);
-// void gdk_gc_set_line_attributes (GdkGC *gc, gint line_width, GdkLineStyle line_style, GdkCapStyle cap_style, GdkJoinStyle join_style);
-// void gdk_gc_set_dashes (GdkGC *gc, gint dash_offset, gint8 dash_list[], gint n);
-// void gdk_gc_offset (GdkGC *gc, gint x_offset, gint y_offset);
-// void gdk_gc_copy (GdkGC *dst_gc, GdkGC *src_gc);
-// void gdk_gc_set_colormap (GdkGC *gc, GdkColormap *colormap);
-// GdkColormap *gdk_gc_get_colormap (GdkGC *gc);
-func (v *GdkGC) SetRgbFgColor(color *GdkColor) {
-	C.gdk_gc_set_rgb_fg_color(v.GC, &color.Color)
-}
-func (v *GdkGC) SetRgbBgColor(color *GdkColor) {
-	C.gdk_gc_set_rgb_bg_color(v.GC, &color.Color)
-}
-// GdkScreen * gdk_gc_get_screen (GdkGC *gc);
-
-//-----------------------------------------------------------------------
-// GdkDrawable
-//-----------------------------------------------------------------------
-type GdkDrawable struct {
-	Drawable *C.GdkDrawable
-}
-
-func (v *GdkDrawable) DrawPoint(gc *GdkGC, x int, y int) {
-	C.gdk_draw_point(v.Drawable, gc.GC, C.gint(x), C.gint(y))
-}
-func (v *GdkDrawable) DrawLine(gc *GdkGC, x1 int, y1 int, x2 int, y2 int) {
-	C.gdk_draw_line(v.Drawable, gc.GC, C.gint(x1), C.gint(y1), C.gint(x2), C.gint(y2))
-}
-func (v *GdkDrawable) DrawRectangle(gc *GdkGC, filled bool, x int, y int, width int, height int) {
-	C.gdk_draw_rectangle(v.Drawable, gc.GC, bool2gboolean(filled), C.gint(x), C.gint(y), C.gint(width), C.gint(height))
-}
-func (v *GdkDrawable) DrawArc(gc *GdkGC, filled bool, x int, y int, width int, height int, angle1 int, angle2 int) {
-	C.gdk_draw_arc(v.Drawable, gc.GC, bool2gboolean(filled), C.gint(x), C.gint(y), C.gint(width), C.gint(height), C.gint(angle1), C.gint(angle2))
-}
-// void gdk_draw_polygon (GdkDrawable *drawable, GdkGC *gc, gboolean filled, const GdkPoint *points, gint n_points);
-// void gdk_draw_string (GdkDrawable *drawable, GdkFont *font, GdkGC *gc, gint x, gint y, const gchar *string);
-func (v *GdkDrawable) DrawString(font *GdkFont, gc *GdkGC, x int, y int, str string) {
-	ptr := C.CString(str)
-	defer C.free_string(ptr)
-	C.gdk_draw_string(v.Drawable, font.Font, gc.GC, C.gint(x), C.gint(y), C.to_gcharptr(ptr))
-}
-// void gdk_draw_text (GdkDrawable *drawable, GdkFont *font, GdkGC *gc, gint x, gint y, const gchar *text, gint text_length);
-// void gdk_draw_text_wc (GdkDrawable *drawable, GdkFont *font, GdkGC *gc, gint x, gint y, const GdkWChar *text, gint text_length);
-func (v *GdkDrawable) DrawDrawable(gc *GdkGC, src *GdkDrawable, xsrc int, ysrc int, xdest int, ydest int, width int, height int) {
-	C.gdk_draw_drawable(v.Drawable, gc.GC, src.Drawable, C.gint(xsrc), C.gint(ysrc), C.gint(xdest), C.gint(ydest), C.gint(width), C.gint(height))
-}
-// void gdk_draw_image (GdkDrawable *drawable, GdkGC *gc, GdkImage *image, gint xsrc, gint ysrc, gint xdest, gint ydest, gint width, gint height);
-// void gdk_draw_points (GdkDrawable *drawable, GdkGC *gc, const GdkPoint *points, gint n_points);
-// void gdk_draw_segments (GdkDrawable *drawable, GdkGC *gc, const GdkSegment *segs, gint n_segs);
-// void gdk_draw_lines (GdkDrawable *drawable, GdkGC *gc, const GdkPoint *points, gint n_points);
-// void gdk_draw_pixbuf (GdkDrawable *drawable, GdkGC *gc, const GdkPixbuf *pixbuf, gint src_x, gint src_y, gint dest_x, gint dest_y, gint width, gint height, GdkRgbDither dither, gint x_dither, gint y_dither);
-// void gdk_draw_glyphs (GdkDrawable *drawable, GdkGC *gc, PangoFont *font, gint x, gint y, PangoGlyphString *glyphs);
-// void gdk_draw_layout_line (GdkDrawable *drawable, GdkGC *gc, gint x, gint y, PangoLayoutLine *line);
-// void gdk_draw_layout (GdkDrawable *drawable, GdkGC *gc, gint x, gint y, PangoLayout *layout);
-// void gdk_draw_layout_line_with_colors (GdkDrawable *drawable, GdkGC *gc, gint x, gint y, PangoLayoutLine *line, const GdkColor *foreground, const GdkColor *background);
-// void gdk_draw_layout_with_colors (GdkDrawable *drawable, GdkGC *gc, gint x, gint y, PangoLayout *layout, const GdkColor *foreground, const GdkColor *background);
-// void gdk_draw_glyphs_transformed (GdkDrawable *drawable, GdkGC	 *gc, const PangoMatrix *matrix, PangoFont *font, gint x, gint y, PangoGlyphString *glyphs);
-// void gdk_draw_trapezoids (GdkDrawable *drawable, GdkGC	 *gc, const GdkTrapezoid *trapezoids, gint n_trapezoids);
-// #define gdk_draw_pixmap gdk_draw_drawable
-// #define gdk_draw_bitmap gdk_draw_drawable
-// GdkImage* gdk_drawable_get_image (GdkDrawable *drawable, gint x, gint y, gint width, gint height);
-// GdkImage *gdk_drawable_copy_to_image (GdkDrawable *drawable, GdkImage *image, gint src_x, gint src_y, gint dest_x, gint dest_y, gint width, gint height);
-// GdkRegion *gdk_drawable_get_clip_region (GdkDrawable *drawable);
-// GdkRegion *gdk_drawable_get_visible_region (GdkDrawable *drawable);
-
-//-----------------------------------------------------------------------
 // GdkWindow
 //-----------------------------------------------------------------------
 type GdkModifierType int
@@ -483,74 +312,12 @@ func WindowFromUnsafe(window unsafe.Pointer) *GdkWindow {
 		C.to_GdkWindow(window)}
 }
 
-func (v *GdkWindow) GetPointer(x *int, y *int, mask *GdkModifierType) *GdkWindow {
-	var cx, cy C.gint
-	var mt C.GdkModifierType
-	ret := &GdkWindow{
-		C.gdk_window_get_pointer(v.Window, &cx, &cy, &mt)}
-	*x = int(cx)
-	*y = int(cy)
-	*mask = GdkModifierType(mt)
-	return ret
-}
-
-func (v *GdkWindow) GetDrawable() *GdkDrawable {
-	return &GdkDrawable{
-		(*C.GdkDrawable)(v.Window)}
-}
-
-func (v *GdkWindow) Invalidate(rect *Rectangle, invalidate_children bool) {
-	if rect != nil {
-		var _rect C.GdkRectangle
-		_rect.x = C.gint(rect.X)
-		_rect.y = C.gint(rect.Y)
-		_rect.width = C.gint(rect.Width)
-		_rect.height = C.gint(rect.Height)
-		C.gdk_window_invalidate_rect(v.Window, &_rect, bool2gboolean(invalidate_children))
-	} else {
-		C.gdk_window_invalidate_rect(v.Window, nil, bool2gboolean(invalidate_children))
-	}
-}
-
 func (v *GdkWindow) Show() {
 	C.gdk_window_show(v.Window)
 }
 
 func (v *GdkWindow) Raise() {
 	C.gdk_window_raise(v.Window)
-}
-
-//-----------------------------------------------------------------------
-// GdkPixmap
-//-----------------------------------------------------------------------
-type GdkPixmap struct {
-	Pixmap *C.GdkPixmap
-}
-
-func Pixmap(drawable *GdkDrawable, width int, height int, depth int) *GdkPixmap {
-	return &GdkPixmap{
-		C.gdk_pixmap_new(drawable.Drawable, C.gint(width), C.gint(height), C.gint(depth))}
-}
-// GdkBitmap* gdk_bitmap_create_from_data (GdkDrawable *drawable, const gchar *data, gint width, gint height);
-// GdkPixmap* gdk_pixmap_create_from_data (GdkDrawable *drawable, const gchar *data, gint width, gint height, gint depth, const GdkColor *fg, const GdkColor *bg);
-// GdkPixmap* gdk_pixmap_create_from_xpm (GdkDrawable *drawable, GdkBitmap **mask, const GdkColor *transparent_color, const gchar *filename);
-// GdkPixmap* gdk_pixmap_colormap_create_from_xpm (GdkDrawable *drawable, GdkColormap *colormap, GdkBitmap **mask, const GdkColor *transparent_color, const gchar *filename);
-// GdkPixmap* gdk_pixmap_create_from_xpm_d (GdkDrawable *drawable, GdkBitmap **mask, const GdkColor *transparent_color, gchar **data);
-// GdkPixmap* gdk_pixmap_colormap_create_from_xpm_d (GdkDrawable *drawable, GdkColormap *colormap, GdkBitmap **mask, const GdkColor *transparent_color, gchar **data);
-// GdkPixmap* gdk_pixmap_foreign_new (GdkNativeWindow anid);
-// GdkPixmap* gdk_pixmap_lookup (GdkNativeWindow anid);
-// GdkPixmap* gdk_pixmap_foreign_new_for_display (GdkDisplay *display, GdkNativeWindow anid);
-// GdkPixmap* gdk_pixmap_lookup_for_display (GdkDisplay *display, GdkNativeWindow anid);
-// GdkPixmap* gdk_pixmap_foreign_new_for_screen (GdkScreen *screen, GdkNativeWindow anid, gint width, gint height, gint depth);
-func (v *GdkPixmap) Ref() {
-	C.g_object_ref(C.gpointer(v.Pixmap))
-}
-func (v *GdkPixmap) Unref() {
-	C.g_object_unref(C.gpointer(v.Pixmap))
-}
-func (v *GdkPixmap) GetDrawable() *GdkDrawable {
-	return &GdkDrawable{
-		(*C.GdkDrawable)(v.Pixmap)}
 }
 
 // Subset of gdkkeysyms.h

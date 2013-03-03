@@ -1,3 +1,5 @@
+// +build !fedora
+
 package gtkspell
 
 /*

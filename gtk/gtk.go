@@ -750,6 +750,7 @@ static GtkExpander* to_GtkExpander(GtkWidget* w) { return GTK_EXPANDER(w); }
 static GtkAlignment* to_GtkAlignment(GtkWidget* w) { return GTK_ALIGNMENT(w); }
 static GtkProgressBar* to_GtkProgressBar(GtkWidget* w) { return GTK_PROGRESS_BAR(w); }
 static GtkFixed* to_GtkFixed(GtkWidget* w) { return GTK_FIXED(w); }
+static GtkLayout* to_GtkLayout(GtkWidget* w) { return GTK_LAYOUT(w); }
 static GtkCheckMenuItem* to_GtkCheckMenuItem(GtkWidget* w) { return GTK_CHECK_MENU_ITEM(w); }
 static GtkFileFilter* to_GtkFileFilter(gpointer p) { return GTK_FILE_FILTER(p); }
 */
@@ -6546,10 +6547,23 @@ func (v *GtkFixed) Move(w WidgetLike, x, y int) {
 // GtkLayout
 //-----------------------------------------------------------------------
 
-// gtk_layout_new
-// gtk_layout_put
-// gtk_layout_move
-// gtk_layout_set_size
+type GtkLayout struct {
+	GtkContainer
+}
+
+func Layout() *GtkLayout {
+	return &GtkLayout{GtkContainer{GtkWidget{C.gtk_layout_new(nil, nil)}}}
+}
+func (v *GtkLayout) Put(w WidgetLike, x, y int) {
+	C.gtk_layout_put(C.to_GtkLayout(v.Widget), w.ToNative(), C.gint(x), C.gint(y))
+}
+func (v *GtkLayout) Move(w WidgetLike, x, y int) {
+	C.gtk_layout_move(C.to_GtkLayout(v.Widget), w.ToNative(), C.gint(x), C.gint(y))
+}
+func (v *GtkLayout) SetSize(width, height int) {
+	C.gtk_layout_set_size(C.to_GtkLayout(v.Widget), C.guint(width), C.guint(height))
+}
+
 // gtk_layout_get_size
 // gtk_layout_freeze
 // gtk_layout_thaw

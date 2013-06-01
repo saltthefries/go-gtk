@@ -680,6 +680,14 @@ static GtkCellRenderer* _gtk_cell_renderer_spinner_new(void) {
 #endif
 }
 
+static void scrolled_window_add_with_viewport_wrapper(GtkScrolledWindow* scrolled_window, GtkWidget* child) {
+#if GTK_MAJOR_VERSION > 3 || GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION >= 8
+	gtk_container_add(GTK_CONTAINER(scrolled_window), child);
+#else
+	gtk_scrolled_window_add_with_viewport(scrolled_window, child);
+#endif
+}
+
 //////////////////////////////////////////////
 // ################# Casting #################
 //////////////////////////////////////////////
@@ -753,6 +761,7 @@ static GtkFixed* to_GtkFixed(GtkWidget* w) { return GTK_FIXED(w); }
 static GtkLayout* to_GtkLayout(GtkWidget* w) { return GTK_LAYOUT(w); }
 static GtkCheckMenuItem* to_GtkCheckMenuItem(GtkWidget* w) { return GTK_CHECK_MENU_ITEM(w); }
 static GtkFileFilter* to_GtkFileFilter(gpointer p) { return GTK_FILE_FILTER(p); }
+static GtkGrid* to_GtkGrid(GtkWidget* w) { return GTK_GRID(w); }
 */
 // #cgo pkg-config: gtk+-3.0
 import "C"
@@ -817,7 +826,7 @@ func variadicButtonsToArrays(buttons []interface{}) ([]string, []int) {
 		btext, ok := buttons[2*i].(string)
 		if !ok {
 			argumentPanic("button text must be a string")
-	}
+		}
 		bresponse, ok := buttons[2*i+1].(int)
 		if !ok {
 			argumentPanic("button response must be an int")
@@ -2410,7 +2419,7 @@ func (v *GtkLabel) SetText(label string) {
 }
 
 func (v *GtkLabel) SetMnemonicWidget(widget WidgetLike) {
-  C.gtk_label_set_mnemonic_widget(C.to_GtkLabel(v.Widget), widget.ToNative())
+	C.gtk_label_set_mnemonic_widget(C.to_GtkLabel(v.Widget), widget.ToNative())
 }
 
 func (v *GtkLabel) SetMarkup(markup string) {
@@ -2420,7 +2429,7 @@ func (v *GtkLabel) SetMarkup(markup string) {
 }
 
 func (v *GtkLabel) GetMnemonicWidget() *GtkWidget {
-  return &GtkWidget{C.gtk_label_get_mnemonic_widget(C.to_GtkLabel(v.Widget))}
+	return &GtkWidget{C.gtk_label_get_mnemonic_widget(C.to_GtkLabel(v.Widget))}
 }
 
 func (v *GtkLabel) SetPattern(pattern string) {
@@ -2562,7 +2571,7 @@ type GtkOrientation int
 
 const (
 	GTK_ORIENTATION_HORIZONTAL GtkOrientation = 0
-	GTK_ORIENTATION_VERTICAL GtkOrientation = 1
+	GTK_ORIENTATION_VERTICAL   GtkOrientation = 1
 )
 
 // gtk_orientable_get_orientation
@@ -2720,7 +2729,7 @@ func (v *GtkInfoBar) GetActionArea() *GtkWidget {
 	panic_if_version_older_auto(2, 18, 0)
 	return &GtkWidget{C._gtk_info_bar_get_action_area(C.to_GtkInfoBar(v.Widget))}
 }
- 
+
 func (v *GtkInfoBar) GetContentArea() *GtkWidget {
 	panic_if_version_older_auto(2, 18, 0)
 	return &GtkWidget{C._gtk_info_bar_get_content_area(C.to_GtkInfoBar(v.Widget))}
@@ -2935,6 +2944,7 @@ func ButtonWithMnemonic(label string) *GtkButton {
 	return &GtkButton{GtkBin{GtkContainer{GtkWidget{
 		C.gtk_button_new_with_mnemonic(C.to_gcharptr(ptr))}}}}
 }
+
 // gtk_button_new_from_stock
 // gtk_button_pressed //deprecated since 2.20
 // gtk_button_released //deprecated since 2.20
@@ -2978,11 +2988,11 @@ func (v *GtkButton) SetFocusOnClick(setting bool) {
 	C.gtk_button_set_focus_on_click(C.to_GtkButton(v.Widget), bool2gboolean(setting))
 }
 func (v *GtkButton) SetAlignment(xalign, yalign float64) {
-	C.gtk_button_set_alignment(C.to_GtkButton(v.Widget), C.gfloat(xalign), C.gfloat(yalign) )
+	C.gtk_button_set_alignment(C.to_GtkButton(v.Widget), C.gfloat(xalign), C.gfloat(yalign))
 }
 func (v *GtkButton) GetAlignment() (xalign, yalign float64) {
-	var xalign_,yalign_ C.gfloat
-	C.gtk_button_get_alignment(C.to_GtkButton(v.Widget), &xalign_, &yalign_ )
+	var xalign_, yalign_ C.gfloat
+	C.gtk_button_get_alignment(C.to_GtkButton(v.Widget), &xalign_, &yalign_)
 	return float64(xalign_), float64(yalign_)
 }
 func (v *GtkButton) SetImage(image WidgetLike) {
@@ -3355,6 +3365,7 @@ func (v *GtkEntryBuffer) SetText(text string) {
 	C._gtk_entry_buffer_set_text(v.EntryBuffer,
 		C.to_gcharptr(ptr), C.gint(len(text)))
 }
+
 // gtk_entry_buffer_get_bytes //since 2.18
 /*func (v *GtkEntryBuffer) GetBytes() ? {
 	panic_if_version_older_auto(2, 18, 0)
@@ -3386,6 +3397,7 @@ func (v *GtkEntryBuffer) DeleteText(position uint, nChars int) uint {
 	return uint(C._gtk_entry_buffer_delete_text(v.EntryBuffer,
 		C.guint(position), C.gint(nChars)))
 }
+
 // gtk_entry_buffer_emit_deleted_text //since 2.18
 // gtk_entry_buffer_emit_inserted_text //since 2.18
 
@@ -3411,6 +3423,7 @@ func (v *GtkEntryCompletion) GetModel() *GtkTreeModel {
 }
 
 type GtkEntryCompletionMatchFunc func(completion *GtkEntryCompletion, key string, iter *GtkTreeIter, data interface{})
+
 // gtk_entry_completion_set_match_func
 
 func (v *GtkEntryCompletion) SetMinimumKeyLength(length int) {
@@ -4025,6 +4038,7 @@ func (v *GtkTextTag) SetPriority(priority int) {
 func (v *GtkTextTag) GetPriority() int {
 	return int(C.gtk_text_tag_get_priority(v.TextTag))
 }
+
 // gtk_text_tag_event
 
 //-----------------------------------------------------------------------
@@ -4872,6 +4886,7 @@ func (v *GtkIconView) GetPixbufColumn() int {
 func (v *GtkIconView) SetPixbufColumn(pixbuf_column int) {
 	C.gtk_icon_view_set_pixbuf_column(C.to_GtkIconView(v.Widget), C.gint(pixbuf_column))
 }
+
 // gtk_icon_view_get_path_at_pos
 // gtk_icon_view_get_item_at_pos
 // gtk_icon_view_convert_widget_to_bin_window_coords
@@ -6900,7 +6915,7 @@ func (v *GtkScrolledWindow) SetPolicy(hscrollbar_policy GtkPolicyType, vscrollba
 	C.gtk_scrolled_window_set_policy(C.to_GtkScrolledWindow(v.Widget), C.GtkPolicyType(hscrollbar_policy), C.GtkPolicyType(vscrollbar_policy))
 }
 func (v *GtkScrolledWindow) AddWithViewPort(w WidgetLike) {
-	C.gtk_scrolled_window_add_with_viewport(C.to_GtkScrolledWindow(v.Widget), w.ToNative())
+	C.scrolled_window_add_with_viewport_wrapper(C.to_GtkScrolledWindow(v.Widget), w.ToNative())
 }
 func (v *GtkScrolledWindow) SetPlacement(window_placement GtkCornerType) {
 	C.gtk_scrolled_window_set_placement(C.to_GtkScrolledWindow(v.Widget), C.GtkCornerType(window_placement))
@@ -6941,9 +6956,9 @@ type GtkPrintOperation struct {
 type GtkPrintOperationResult int
 
 const (
-	GTK_PRINT_OPERATION_RESULT_ERROR GtkPrintOperationResult = 0
-	GTK_PRINT_OPERATION_RESULT_APPLY GtkPrintOperationResult = 1
-	GTK_PRINT_OPERATION_RESULT_CANCEL GtkPrintOperationResult = 2
+	GTK_PRINT_OPERATION_RESULT_ERROR       GtkPrintOperationResult = 0
+	GTK_PRINT_OPERATION_RESULT_APPLY       GtkPrintOperationResult = 1
+	GTK_PRINT_OPERATION_RESULT_CANCEL      GtkPrintOperationResult = 2
 	GTK_PRINT_OPERATION_RESULT_IN_PROGRESS GtkPrintOperationResult = 3
 )
 
@@ -6951,9 +6966,9 @@ type GtkPrintOperationAction int
 
 const (
 	GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG GtkPrintOperationAction = 0
-	GTK_PRINT_OPERATION_ACTION_PRINT GtkPrintOperationAction = 1
-	GTK_PRINT_OPERATION_ACTION_PREVIEW GtkPrintOperationAction = 2
-	GTK_PRINT_OPERATION_ACTION_EXPOR GtkPrintOperationAction = 3
+	GTK_PRINT_OPERATION_ACTION_PRINT        GtkPrintOperationAction = 1
+	GTK_PRINT_OPERATION_ACTION_PREVIEW      GtkPrintOperationAction = 2
+	GTK_PRINT_OPERATION_ACTION_EXPOR        GtkPrintOperationAction = 3
 )
 
 func PrintOperation() *GtkPrintOperation {
@@ -7021,16 +7036,16 @@ func (v *GtkPrintOperation) Connect(s string, f interface{}, datas ...interface{
 //-----------------------------------------------------------------------
 // GtkPrintContext
 //-----------------------------------------------------------------------
-type GtkPrintContext struct{
+type GtkPrintContext struct {
 	PrintContext *C.GtkPrintContext
 }
 
 func (v *GtkPrintContext) GetCairoContext() *C.cairo_t {
-	return C.gtk_print_context_get_cairo_context(v.PrintContext);
+	return C.gtk_print_context_get_cairo_context(v.PrintContext)
 }
 
 func (v *GtkPrintContext) SetCairoContext(cairo *C.cairo_t, dpi_x float64, dpi_y float64) {
-	C.gtk_print_context_set_cairo_context(v.PrintContext, cairo, C.double(dpi_x), C.double(dpi_y));
+	C.gtk_print_context_set_cairo_context(v.PrintContext, cairo, C.double(dpi_x), C.double(dpi_y))
 }
 
 // gtk_print_context_get_page_setup
@@ -7484,6 +7499,7 @@ func (v *GtkTooltip) SetIconFromIconName(icon_name string, size GtkIconSize) {
 	defer C.free_string(ptr)
 	C.gtk_tooltip_set_icon_from_icon_name(v.Tooltip, C.to_gcharptr(ptr), C.GtkIconSize(size))
 }
+
 // gtk_tooltip_set_icon_from_gicon //since 2.20
 // gtk_tooltip_set_custom
 // gtk_tooltip_trigger_tooltip_query
@@ -8434,11 +8450,60 @@ func (v *GtkWidget) ModifyFontEasy(desc string) {
 }
 
 func (v *GtkWidget) ModifyFG(state GtkStateType, color *gdk.GdkColor) {
-	C.gtk_widget_modify_fg(v.Widget, C.GtkStateType(state), (*C.GdkColor)(unsafe.Pointer(&color.Color)) )
+	C.gtk_widget_modify_fg(v.Widget, C.GtkStateType(state), (*C.GdkColor)(unsafe.Pointer(&color.Color)))
 }
 
 func (v *GtkWidget) ModifyBG(state GtkStateType, color *gdk.GdkColor) {
-	C.gtk_widget_modify_bg(v.Widget, C.GtkStateType(state), (*C.GdkColor)(unsafe.Pointer(&color.Color)) )
+	C.gtk_widget_modify_bg(v.Widget, C.GtkStateType(state), (*C.GdkColor)(unsafe.Pointer(&color.Color)))
+}
+
+func (v *GtkWidget) SetHExpand(on bool) {
+	C.gtk_widget_set_hexpand(v.Widget, bool2gboolean(on))
+}
+
+func (v *GtkWidget) SetVExpand(on bool) {
+	C.gtk_widget_set_vexpand(v.Widget, bool2gboolean(on))
+}
+
+func (v *GtkWidget) SetMargin(margin int) {
+	m := C.gint(margin)
+	C.gtk_widget_set_margin_top(v.Widget, m)
+	C.gtk_widget_set_margin_bottom(v.Widget, m)
+	C.gtk_widget_set_margin_left(v.Widget, m)
+	C.gtk_widget_set_margin_right(v.Widget, m)
+}
+
+func (v *GtkWidget) SetMarginTop(margin int) {
+	C.gtk_widget_set_margin_top(v.Widget, C.gint(margin))
+}
+
+func (v *GtkWidget) SetMarginBottom(margin int) {
+	C.gtk_widget_set_margin_bottom(v.Widget, C.gint(margin))
+}
+
+func (v *GtkWidget) SetMarginLeft(margin int) {
+	C.gtk_widget_set_margin_left(v.Widget, C.gint(margin))
+}
+
+func (v *GtkWidget) SetMarginRight(margin int) {
+	C.gtk_widget_set_margin_right(v.Widget, C.gint(margin))
+}
+
+type GtkAlign int
+
+const (
+	GTK_ALIGN_FILL   GtkAlign = 0
+	GTK_ALIGN_START  GtkAlign = 1
+	GTK_ALIGN_END    GtkAlign = 2
+	GTK_ALIGN_CENTER GtkAlign = 3
+)
+
+func (v *GtkWidget) SetHAlign(align GtkAlign) {
+	C.gtk_widget_set_halign(v.Widget, C.GtkAlign(align))
+}
+
+func (v *GtkWidget) SetVAlign(align GtkAlign) {
+	C.gtk_widget_set_valign(v.Widget, C.GtkAlign(align))
 }
 
 //-----------------------------------------------------------------------
@@ -8684,3 +8749,28 @@ func (v *GtkBuilder) GetTypeFromName(type_name string) int {
 
 // gboolean gtk_builder_value_from_string (GtkBuilder *builder, GParamSpec *pspec, const gchar *string, GValue *value, GError **error);
 // gboolean gtk_builder_value_from_string_type (GtkBuilder *builder, GType type, const gchar *string, GValue *value, GError **error);
+
+//-----------------------------------------------------------------------
+// GtkGrid
+//-----------------------------------------------------------------------
+
+type GtkGrid struct {
+	GtkContainer
+}
+
+func Grid() *GtkGrid {
+	return &GtkGrid{GtkContainer{GtkWidget{
+		C.gtk_grid_new()}}}
+}
+
+func (g *GtkGrid) Attach(child WidgetLike, x, y, w, h int) {
+	C.gtk_grid_attach(C.to_GtkGrid(g.Widget), child.ToNative(), C.gint(x), C.gint(y), C.gint(w), C.gint(h))
+}
+
+func (g *GtkGrid) SetRowSpacing(s int) {
+	C.gtk_grid_set_row_spacing(C.to_GtkGrid(g.Widget), C.guint(s))
+}
+
+func (g *GtkGrid) SetColSpacing(s int) {
+	C.gtk_grid_set_column_spacing(C.to_GtkGrid(g.Widget), C.guint(s))
+}

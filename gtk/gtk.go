@@ -3046,8 +3046,12 @@ func RadioButton(group *glib.SList) *GtkRadioButton {
 		C.gtk_radio_button_new(nil)}}}}}}}
 }
 func RadioButtonFromWidget(w *GtkRadioButton) *GtkRadioButton {
+	var widget *C.GtkRadioButton
+	if w != nil {
+		widget = C.to_GtkRadioButton(w.Widget)
+	}
 	return &GtkRadioButton{GtkCheckButton{GtkToggleButton{GtkButton{GtkBin{GtkContainer{GtkWidget{
-		C.gtk_radio_button_new_from_widget(C.to_GtkRadioButton(w.Widget))}}}}}}}
+		C.gtk_radio_button_new_from_widget(widget)}}}}}}}
 }
 func RadioButtonWithLabel(group *glib.SList, label string) *GtkRadioButton {
 	ptr := C.CString(label)
@@ -3062,8 +3066,12 @@ func RadioButtonWithLabel(group *glib.SList, label string) *GtkRadioButton {
 func RadioButtonWithLabelFromWidget(w *GtkRadioButton, label string) *GtkRadioButton {
 	ptr := C.CString(label)
 	defer C.free_string(ptr)
+	var widget *C.GtkRadioButton
+	if w != nil {
+		widget = C.to_GtkRadioButton(w.Widget)
+	}
 	return &GtkRadioButton{GtkCheckButton{GtkToggleButton{GtkButton{GtkBin{GtkContainer{GtkWidget{
-		C.gtk_radio_button_new_with_label_from_widget(C.to_GtkRadioButton(w.Widget), C.to_gcharptr(ptr))}}}}}}}
+		C.gtk_radio_button_new_with_label_from_widget(widget, C.to_gcharptr(ptr))}}}}}}}
 }
 func RadioButtonWithMnemonic(group *glib.SList, label string) *GtkRadioButton {
 	ptr := C.CString(label)
@@ -3078,8 +3086,12 @@ func RadioButtonWithMnemonic(group *glib.SList, label string) *GtkRadioButton {
 func RadioButtonWithMnemonicFromWidget(w *GtkRadioButton, label string) *GtkRadioButton {
 	ptr := C.CString(label)
 	defer C.free_string(ptr)
+	var widget *C.GtkRadioButton
+	if w != nil {
+		widget = C.to_GtkRadioButton(w.Widget)
+	}
 	return &GtkRadioButton{GtkCheckButton{GtkToggleButton{GtkButton{GtkBin{GtkContainer{GtkWidget{
-		C.gtk_radio_button_new_with_mnemonic_from_widget(C.to_GtkRadioButton(w.Widget), C.to_gcharptr(ptr))}}}}}}}
+		C.gtk_radio_button_new_with_mnemonic_from_widget(widget, C.to_gcharptr(ptr))}}}}}}}
 }
 func (v *GtkRadioButton) GetGroup() *glib.SList {
 	return glib.SListFromNative(unsafe.Pointer(C.gtk_radio_button_get_group(C.to_GtkRadioButton(v.Widget))))

@@ -762,6 +762,8 @@ static GtkLayout* to_GtkLayout(GtkWidget* w) { return GTK_LAYOUT(w); }
 static GtkCheckMenuItem* to_GtkCheckMenuItem(GtkWidget* w) { return GTK_CHECK_MENU_ITEM(w); }
 static GtkFileFilter* to_GtkFileFilter(gpointer p) { return GTK_FILE_FILTER(p); }
 static GtkGrid* to_GtkGrid(GtkWidget* w) { return GTK_GRID(w); }
+static GtkCalendar* to_GtkCalendar(GtkWidget* w) { return GTK_CALENDAR(w); }
+static GtkSpinButton* to_GtkSpinButton(GtkWidget* w) { return GTK_SPIN_BUTTON(w); }
 */
 // #cgo pkg-config: gtk+-3.0
 import "C"
@@ -3513,6 +3515,19 @@ func (v *GtkEntryCompletion) GetPopupSingleMatch() bool {
 //-----------------------------------------------------------------------
 // GtkSpinButton
 //-----------------------------------------------------------------------
+
+type GtkSpinButton struct {
+	GtkEntry
+}
+
+func SpinButtonWithRange(min, max, step float64) *GtkSpinButton {
+	widget := GtkWidget{C.gtk_spin_button_new_with_range(C.gdouble(min), C.gdouble(max), C.gdouble(step))}
+	return &GtkSpinButton{GtkEntry{widget, GtkEditable{C.to_GtkEditable(widget.Widget)}}}
+}
+
+func (spin *GtkSpinButton) GetInt() int {
+	return int(C.gtk_spin_button_get_value_as_int(C.to_GtkSpinButton(spin.Widget)))
+}
 
 // gtk_spin_button_configure
 // gtk_spin_button_new
@@ -7365,6 +7380,20 @@ func (v *GtkAdjustment) SetUpper(upper float64) {
 // GtkCalendar
 //-----------------------------------------------------------------------
 
+type GtkCalendar struct {
+	GtkWidget
+}
+
+func Calendar() *GtkCalendar {
+	return &GtkCalendar{GtkWidget{C.gtk_calendar_new()}}
+}
+
+func (cal *GtkCalendar) GetDate() (year, month, day int) {
+	var cyear, cmonth, cday C.guint
+	C.gtk_calendar_get_date(C.to_GtkCalendar(cal.Widget), &cyear, &cmonth, &cday)
+	return int(cyear), int(cmonth), int(cday)
+}
+
 // gtk_calendar_new
 // gtk_calendar_select_month
 // gtk_calendar_select_day
@@ -8785,4 +8814,12 @@ func (g *GtkGrid) SetRowSpacing(s int) {
 
 func (g *GtkGrid) SetColSpacing(s int) {
 	C.gtk_grid_set_column_spacing(C.to_GtkGrid(g.Widget), C.guint(s))
+}
+
+func (g *GtkGrid) SetRowHomogeneous(t bool) {
+	C.gtk_grid_set_row_homogeneous(C.to_GtkGrid(g.Widget), bool2gboolean(t))
+}
+
+func (g *GtkGrid) SetColumnHomogeneous(t bool) {
+	C.gtk_grid_set_column_homogeneous(C.to_GtkGrid(g.Widget), bool2gboolean(t))
 }

@@ -3,13 +3,14 @@ Go Bindings for Gtk+ 2. Support version 2.16 and later.
 */
 package gtk
 
+// #cgo darwin LDFLAGS: -headerpad_max_install_names
+
 /*
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #ifdef _WIN32
 #include <windows.h>
 #else
-#include <gdk/gdkx.h>
 #endif
 #include <unistd.h>
 #include <stdlib.h>
@@ -1963,10 +1964,6 @@ func (v *GtkWindow) Move(x int, y int) {
 
 func (v *GtkWindow) Resize(width int, height int) {
 	C.gtk_window_resize(C.to_GtkWindow(v.Widget), C.gint(width), C.gint(height))
-}
-
-func (v *GtkWindow) XID() int32 {
-	return gdk.WindowFromUnsafe(unsafe.Pointer(C.gtk_widget_get_window(v.Widget))).GetNativeWindowID()
 }
 
 // gtk_window_set_default_icon_list

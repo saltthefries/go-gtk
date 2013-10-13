@@ -6263,6 +6263,12 @@ func (v *GtkFileChooser) GetLocalOnly() bool {
 // gboolean gtk_file_chooser_get_create_folders(GtkFileChooser* chooser); //since 2.18
 // void gtk_file_chooser_set_current_name(GtkFileChooser* chooser, const gchar* name);
 
+func (v *GtkFileChooser) SetCurrentName(filename string) {
+	ptr := C.CString(filename)
+	defer C.free_string(ptr)
+	C.gtk_file_chooser_set_current_name(v.w, C.to_gcharptr(ptr))
+}
+
 func (v *GtkFileChooser) GetFilename() string {
 	return C.GoString(C.to_charptr(C.gtk_file_chooser_get_filename(v.w)))
 }

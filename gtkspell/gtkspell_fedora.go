@@ -1,4 +1,4 @@
-// +build fedora
+// +build !ubuntu
 
 package gtkspell
 

@@ -40,6 +40,7 @@ func gboolean2bool(b C.gboolean) bool {
 	}
 	return false
 }
+
 //-----------------------------------------------------------------------
 // Types
 //-----------------------------------------------------------------------
@@ -67,7 +68,7 @@ func Flush() {
 // GdkSelection
 //-----------------------------------------------------------------------
 const (
-	GDK_SELECTION_PRIMARY GdkAtom = GdkAtom(uintptr(1))
+	GDK_SELECTION_PRIMARY   GdkAtom = GdkAtom(uintptr(1))
 	GDK_SELECTION_SECONDARY GdkAtom = GdkAtom(uintptr(2))
 	GDK_SELECTION_CLIPBOARD GdkAtom = GdkAtom(uintptr(69))
 )
@@ -2589,13 +2590,13 @@ type EventFocus struct {
 }
 
 type EventConfigure struct {
-	Type int
-	Window unsafe.Pointer
+	Type      int
+	Window    unsafe.Pointer
 	SendEvent uint8
-	X int
-	Y int
-	Width int
-	Height int
+	X         int
+	Y         int
+	Width     int
+	Height    int
 }
 
 type EventProperty struct {

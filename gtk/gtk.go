@@ -8164,7 +8164,6 @@ func (v *GtkWidget) HideOnDelete() {
 // gtk_widget_get_pango_context
 // gtk_widget_create_pango_layout
 
-
 // gtk_widget_pop_composite_child
 // gtk_widget_push_composite_child
 // gtk_widget_queue_draw_area

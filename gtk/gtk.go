@@ -337,9 +337,6 @@ static gboolean _gtk_widget_get_sensitive(GtkWidget *widget) {
 static gboolean _gtk_widget_is_sensitive(GtkWidget *widget) {
 	return gtk_widget_is_sensitive(widget);
 }
-static GtkStateType _gtk_widget_get_state(GtkWidget *widget) {
-	return gtk_widget_get_state(widget);
-}
 static gboolean _gtk_widget_get_visible(GtkWidget *widget) {
 	return gtk_widget_get_visible(widget);
 }
@@ -487,9 +484,6 @@ static gboolean _gtk_widget_get_sensitive(GtkWidget *widget) {
 	return 0;
 }
 static gboolean _gtk_widget_is_sensitive(GtkWidget *widget) {
-	return 0;
-}
-static GtkStateType _gtk_widget_get_state(GtkWidget *widget) {
 	return 0;
 }
 static gboolean _gtk_widget_get_visible(GtkWidget *widget) {
@@ -1265,24 +1259,8 @@ type GtkStockItem struct {
 	StockItem *C.GtkStockItem
 }
 
-func (v *GtkStockItem) Add(nitems uint) {
-	C.gtk_stock_add(v.StockItem, C.guint(nitems))
-}
-func (v *GtkStockItem) AddStatic(nitems uint) {
-	C.gtk_stock_add_static(v.StockItem, C.guint(nitems))
-}
-func GtkStockLookup(stock_id string, item *GtkStockItem) bool {
-	ptr := C.CString(stock_id)
-	defer C.free_string(ptr)
-	return gboolean2bool(C.gtk_stock_lookup(C.to_gcharptr(ptr), item.StockItem))
-}
-
 // gtk_stock_item_copy
 // gtk_stock_item_free
-
-func GtkStockListIDs() *glib.SList {
-	return glib.SListFromNative(unsafe.Pointer(C.gtk_stock_list_ids()))
-}
 
 //-----------------------------------------------------------------------
 // Themeable Stock Images
@@ -2330,14 +2308,6 @@ func ImageFromPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) *GtkImage {
 }
 
 // gtk_image_new_from_pixmap
-
-func ImageFromStock(stock_id string, size GtkIconSize) *GtkImage {
-	ptr := C.CString(stock_id)
-	defer C.free_string(ptr)
-	return &GtkImage{GtkWidget{
-		C.gtk_image_new_from_stock(C.to_gcharptr(ptr), C.GtkIconSize(size))}}
-}
-
 // gtk_image_new_from_animation
 // gtk_image_new_from_icon_name
 // gtk_image_new_from_gicon
@@ -2356,13 +2326,6 @@ func (v *GtkImage) SetFromPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) {
 }
 
 // gtk_image_set_from_pixmap
-
-func (v *GtkImage) SetFromStock(stock_id string, size GtkIconSize) {
-	ptr := C.CString(stock_id)
-	defer C.free_string(ptr)
-	C.gtk_image_set_from_stock(C.to_GtkImage(v.Widget), C.to_gcharptr(ptr), C.GtkIconSize(size))
-}
-
 // gtk_image_set_from_animation
 // gtk_image_set_from_icon_name
 // gtk_image_set_from_gicon
@@ -2755,12 +2718,6 @@ func StatusIconFromFile(filename string) *GtkStatusIcon {
 	return &GtkStatusIcon{
 		C.gtk_status_icon_new_from_file(C.to_gcharptr(ptr))}
 }
-func StatusIconFromStock(stock_id string) *GtkStatusIcon {
-	ptr := C.CString(stock_id)
-	defer C.free_string(ptr)
-	return &GtkStatusIcon{
-		C.gtk_status_icon_new_from_stock(C.to_gcharptr(ptr))}
-}
 func StatusIconFromIconName(icon_name string) *GtkStatusIcon {
 	ptr := C.CString(icon_name)
 	defer C.free_string(ptr)
@@ -2778,11 +2735,6 @@ func (v *GtkStatusIcon) SetFromFile(filename string) {
 	defer C.free_string(ptr)
 	C.gtk_status_icon_set_from_file(v.StatusIcon, C.to_gcharptr(ptr))
 }
-func (v *GtkStatusIcon) SetFromStock(stock_id string) {
-	ptr := C.CString(stock_id)
-	defer C.free_string(ptr)
-	C.gtk_status_icon_set_from_stock(v.StatusIcon, C.to_gcharptr(ptr))
-}
 func (v *GtkStatusIcon) SetFromIconName(icon_name string) {
 	ptr := C.CString(icon_name)
 	defer C.free_string(ptr)
@@ -2795,9 +2747,6 @@ func (v *GtkStatusIcon) SetFromIconName(icon_name string) {
 func (v *GtkStatusIcon) GetPixbuf() *gdkpixbuf.GdkPixbuf {
 	return &gdkpixbuf.GdkPixbuf{
 		C.gtk_status_icon_get_pixbuf(v.StatusIcon)}
-}
-func (v *GtkStatusIcon) GetStock() string {
-	return C.GoString(C.to_charptr(C.gtk_status_icon_get_stock(v.StatusIcon)))
 }
 func (v *GtkStatusIcon) GetIconName() string {
 	return C.GoString(C.to_charptr(C.gtk_status_icon_get_icon_name(v.StatusIcon)))
@@ -2967,12 +2916,6 @@ func (v *GtkButton) SetLabel(label string) {
 	ptr := C.CString(label)
 	defer C.free_string(ptr)
 	C.gtk_button_set_label(C.to_GtkButton(v.Widget), C.to_gcharptr(ptr))
-}
-func (v *GtkButton) GetUseStock() bool {
-	return gboolean2bool(C.gtk_button_get_use_stock(C.to_GtkButton(v.Widget)))
-}
-func (v *GtkButton) SetUseStock(use bool) {
-	C.gtk_button_set_use_stock(C.to_GtkButton(v.Widget), bool2gboolean(use))
 }
 func (v *GtkButton) GetUseUnderline() bool {
 	return gboolean2bool(C.gtk_button_get_use_underline(C.to_GtkButton(v.Widget)))
@@ -5448,20 +5391,6 @@ func (v *GtkComboBox) Popdown() {
 // gtk_combo_box_get_row_separator_func
 // gtk_combo_box_set_row_separator_func
 
-func (v *GtkComboBox) SetAddTearoffs(add_tearoffs bool) {
-	C.gtk_combo_box_set_add_tearoffs(C.to_GtkComboBox(v.Widget), bool2gboolean(add_tearoffs))
-}
-func (v *GtkComboBox) GetAddTearoffs() bool {
-	return gboolean2bool(C.gtk_combo_box_get_add_tearoffs(C.to_GtkComboBox(v.Widget)))
-}
-func (v *GtkComboBox) SetTitle(title string) {
-	ptr := C.CString(title)
-	defer C.free_string(ptr)
-	C.gtk_combo_box_set_title(C.to_GtkComboBox(v.Widget), C.to_gcharptr(ptr))
-}
-func (v *GtkComboBox) GetTitle() string {
-	return C.GoString(C.to_charptr(C.gtk_combo_box_get_title(C.to_GtkComboBox(v.Widget))))
-}
 func (v *GtkComboBox) SetFocusOnClick(focus_on_click bool) {
 	C.gtk_combo_box_set_focus_on_click(C.to_GtkComboBox(v.Widget), bool2gboolean(focus_on_click))
 }
@@ -5571,9 +5500,6 @@ func (v *GtkMenu) Popup(parent_menu_shell, parent_menu_item WidgetLike, f GtkMen
 // void gtk_menu_set_monitor(GtkMenu *menu, gint monitor_num);
 // gint gtk_menu_get_monitor(GtkMenu *menu);
 
-func (v *GtkMenu) GetTearoffState() bool {
-	return gboolean2bool(C.gtk_menu_get_tearoff_state(C.to_GtkMenu(v.Widget)))
-}
 func (v *GtkMenu) SetReserveToggleSize(b bool) {
 	panic_if_version_older(2, 18, 0, "gtk_menu_set_reserve_toggle_size()")
 	C._gtk_menu_set_reserve_toggle_size(C.to_GtkMenu(v.Widget), bool2gboolean(b))
@@ -5593,11 +5519,6 @@ func (v *GtkMenu) GetActive() *GtkWidget {
 }
 
 // void gtk_menu_set_active (GtkMenu *menu, guint index_);
-
-func (v *GtkMenu) SetTearoffState(b bool) {
-	C.gtk_menu_set_tearoff_state(C.to_GtkMenu(v.Widget), bool2gboolean(b))
-}
-
 // void gtk_menu_attach_to_widget (GtkMenu *menu, GtkWidget *attach_widget, GtkMenuDetachFunc detacher);
 
 func (v *GtkMenu) Detach() {
@@ -7533,11 +7454,6 @@ func (v *GtkTooltip) SetText(text string) {
 func (v *GtkTooltip) SetIcon(pixbuf *gdkpixbuf.GdkPixbuf) {
 	C.gtk_tooltip_set_icon(v.Tooltip, pixbuf.Pixbuf)
 }
-func (v *GtkTooltip) SetIconFromStock(stock_id string, size GtkIconSize) {
-	ptr := C.CString(stock_id)
-	defer C.free_string(ptr)
-	C.gtk_tooltip_set_icon_from_stock(v.Tooltip, C.to_gcharptr(ptr), C.GtkIconSize(size))
-}
 func (v *GtkTooltip) SetIconFromIconName(icon_name string, size GtkIconSize) {
 	ptr := C.CString(icon_name)
 	defer C.free_string(ptr)
@@ -8028,6 +7944,21 @@ const (
 	GTK_STATE_INSENSITIVE GtkStateType = 4
 )
 
+type GtkStateFlags int
+
+const (
+	GTK_STATE_FLAG_NORMAL       GtkStateFlags = 0
+	GTK_STATE_FLAG_ACTIVE       GtkStateFlags = 1 << 0
+	GTK_STATE_FLAG_PRELIGHT     GtkStateFlags = 1 << 1
+	GTK_STATE_FLAG_SELECTED     GtkStateFlags = 1 << 2
+	GTK_STATE_FLAG_INSENSITIVE  GtkStateFlags = 1 << 3
+	GTK_STATE_FLAG_INCONSISTENT GtkStateFlags = 1 << 4
+	GTK_STATE_FLAG_FOCUSED      GtkStateFlags = 1 << 5
+	GTK_STATE_FLAG_BACKDROP     GtkStateFlags = 1 << 6
+	GTK_STATE_FLAG_DIR_LTR      GtkStateFlags = 1 << 7
+	GTK_STATE_FLAG_DIR_RTL      GtkStateFlags = 1 << 8
+)
+
 type WidgetLike interface {
 	ToNative() *C.GtkWidget
 	Hide()
@@ -8161,9 +8092,6 @@ func (v *GtkWindow) SetName(name string) {
 func (v *GtkWindow) GetName() string {
 	return C.GoString(C.to_charptr(C.gtk_widget_get_name(v.Widget)))
 }
-func (v *GtkWidget) SetState(state GtkStateType) {
-	C.gtk_widget_set_state(v.Widget, C.GtkStateType(state))
-}
 func (v *GtkWidget) SetSensitive(setting bool) {
 	C.gtk_widget_set_sensitive(v.Widget, bool2gboolean(setting))
 }
@@ -8236,14 +8164,6 @@ func (v *GtkWidget) HideOnDelete() {
 // gtk_widget_get_pango_context
 // gtk_widget_create_pango_layout
 
-func (v *GtkWidget) RenderIcon(stock_id string, size GtkIconSize, detail string) *gdkpixbuf.GdkPixbuf {
-	pstock_id := C.CString(stock_id)
-	defer C.free_string(pstock_id)
-	pdetail := C.CString(detail)
-	defer C.free_string(pdetail)
-	return &gdkpixbuf.GdkPixbuf{
-		C.gtk_widget_render_icon(v.Widget, C.to_gcharptr(pstock_id), C.GtkIconSize(size), C.to_gcharptr(pdetail))}
-}
 
 // gtk_widget_pop_composite_child
 // gtk_widget_push_composite_child
@@ -8425,10 +8345,6 @@ func (v *GtkWidget) IsSensitive() bool {
 	panic_if_version_older(2, 18, 0, "gtk_widget_is_sensitive()")
 	return gboolean2bool(C._gtk_widget_is_sensitive(v.Widget))
 }
-func (v *GtkWidget) GetState() GtkStateType {
-	panic_if_version_older(2, 18, 0, "gtk_widget_get_state()")
-	return GtkStateType(C._gtk_widget_get_state(v.Widget))
-}
 func (v *GtkWidget) GetVisible() bool {
 	panic_if_version_older(2, 18, 0, "gtk_widget_get_visible()")
 	return gboolean2bool(C._gtk_widget_get_visible(v.Widget))
@@ -8487,18 +8403,19 @@ func (v *GtkWidget) GetTopLevelAsWindow() *GtkWindow {
 	return &GtkWindow{GtkBin{GtkContainer{GtkWidget{
 		C.gtk_widget_get_toplevel(v.Widget)}}}}
 }
-func (v *GtkWidget) ModifyFontEasy(desc string) {
+
+func (v *GtkWidget) OverrideColor(stateFlags GtkStateFlags, color *gdk.GdkRGBA) {
+	C.gtk_widget_override_color(v.Widget, C.GtkStateFlags(stateFlags), (*C.GdkRGBA)(unsafe.Pointer(&color.RGBA)))
+}
+
+func (v *GtkWidget) OverrideBackgroundColor(stateFlags GtkStateFlags, color *gdk.GdkRGBA) {
+	C.gtk_widget_override_background_color(v.Widget, C.GtkStateFlags(stateFlags), (*C.GdkRGBA)(unsafe.Pointer(&color.RGBA)))
+}
+
+func (v *GtkWidget) OverrideFont(desc string) {
 	pdesc := C.CString(desc)
 	defer C.free_string(pdesc)
-	C.gtk_widget_modify_font(v.Widget, C.pango_font_description_from_string(pdesc))
-}
-
-func (v *GtkWidget) ModifyFG(state GtkStateType, color *gdk.GdkColor) {
-	C.gtk_widget_modify_fg(v.Widget, C.GtkStateType(state), (*C.GdkColor)(unsafe.Pointer(&color.Color)))
-}
-
-func (v *GtkWidget) ModifyBG(state GtkStateType, color *gdk.GdkColor) {
-	C.gtk_widget_modify_bg(v.Widget, C.GtkStateType(state), (*C.GdkColor)(unsafe.Pointer(&color.Color)))
+	C.gtk_widget_override_font(v.Widget, C.pango_font_description_from_string(pdesc))
 }
 
 func (v *GtkWidget) SetHExpand(on bool) {

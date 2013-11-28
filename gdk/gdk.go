@@ -2653,3 +2653,17 @@ type GdkDisplay struct {
 func DisplayGetDefault() *GdkDisplay {
 	return &GdkDisplay{C._gdk_display_get_default()}
 }
+
+//-----------------------------------------------------------------------
+// GdkRGBA
+//-----------------------------------------------------------------------
+
+type GdkRGBA struct {
+	RGBA C.GdkRGBA
+}
+
+func RGBA(r, g, b, a float64) *GdkRGBA {
+	return &GdkRGBA{
+		C.GdkRGBA{C.gdouble(r), C.gdouble(g), C.gdouble(b), C.gdouble(a)},
+	}
+}

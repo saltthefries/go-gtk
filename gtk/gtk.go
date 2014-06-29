@@ -843,6 +843,14 @@ func argumentPanic(message string) {
 	}
 }
 
+func fromGdkPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) *C.struct__GdkPixbuf {
+	return (*C.struct__GdkPixbuf)(unsafe.Pointer(pixbuf.Pixbuf))
+}
+
+func toGdkPixbuf(pixbuf *C.struct__GdkPixbuf) *gdkpixbuf.GdkPixbuf {
+	return gdkpixbuf.FromUnsafe(unsafe.Pointer(pixbuf))
+}
+
 //-----------------------------------------------------------------------
 // Main Loop and Events
 //-----------------------------------------------------------------------
@@ -987,7 +995,7 @@ func (v *GtkClipboard) SetText(text string) {
 }
 
 func (v *GtkClipboard) SetImage(pixbuf *gdkpixbuf.GdkPixbuf) {
-	C.gtk_clipboard_set_image(v.Clipboard, pixbuf.Pixbuf)
+	C.gtk_clipboard_set_image(v.Clipboard, fromGdkPixbuf(pixbuf))
 }
 
 func (v *GtkClipboard) Store() {
@@ -2117,11 +2125,11 @@ func (v *GtkAboutDialog) SetTranslatorCredits(translator_credits string) {
 	C.gtk_about_dialog_set_translator_credits(C.to_GtkAboutDialog(v.Widget), C.to_gcharptr(ptr))
 }
 func (v *GtkAboutDialog) GetLogo() *gdkpixbuf.GdkPixbuf {
-	return &gdkpixbuf.GdkPixbuf{
-		C.gtk_about_dialog_get_logo(C.to_GtkAboutDialog(v.Widget))}
+	return toGdkPixbuf(
+		C.gtk_about_dialog_get_logo(C.to_GtkAboutDialog(v.Widget)))
 }
 func (v *GtkAboutDialog) SetLogo(logo *gdkpixbuf.GdkPixbuf) {
-	C.gtk_about_dialog_set_logo(C.to_GtkAboutDialog(v.Widget), logo.Pixbuf)
+	C.gtk_about_dialog_set_logo(C.to_GtkAboutDialog(v.Widget), fromGdkPixbuf(logo))
 }
 func (v *GtkAboutDialog) GetLogoIconName() string {
 	return C.GoString(C.to_charptr(C.gtk_about_dialog_get_logo_icon_name(C.to_GtkAboutDialog(v.Widget))))
@@ -2281,8 +2289,8 @@ type GtkImage struct {
 // gtk_image_get_image
 
 func (v *GtkImage) GetPixbuf() *gdkpixbuf.GdkPixbuf {
-	return &gdkpixbuf.GdkPixbuf{
-		C.gtk_image_get_pixbuf(C.to_GtkImage(v.Widget))}
+	return toGdkPixbuf(
+		C.gtk_image_get_pixbuf(C.to_GtkImage(v.Widget)))
 }
 
 // gtk_image_get_pixmap
@@ -2304,7 +2312,7 @@ func ImageFromFile(filename string) *GtkImage {
 
 func ImageFromPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) *GtkImage {
 	return &GtkImage{GtkWidget{
-		C.gtk_image_new_from_pixbuf(pixbuf.Pixbuf)}}
+		C.gtk_image_new_from_pixbuf(fromGdkPixbuf(pixbuf))}}
 }
 
 // gtk_image_new_from_pixmap
@@ -2322,7 +2330,7 @@ func (v *GtkImage) SetFromFile(filename string) {
 // gtk_image_set_from_image
 
 func (v *GtkImage) SetFromPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) {
-	C.gtk_image_set_from_pixbuf(C.to_GtkImage(v.Widget), pixbuf.Pixbuf)
+	C.gtk_image_set_from_pixbuf(C.to_GtkImage(v.Widget), fromGdkPixbuf(pixbuf))
 }
 
 // gtk_image_set_from_pixmap
@@ -2710,7 +2718,7 @@ func StatusIcon() *GtkStatusIcon {
 }
 func StatusIconFromPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) *GtkStatusIcon {
 	return &GtkStatusIcon{
-		C.gtk_status_icon_new_from_pixbuf(pixbuf.Pixbuf)}
+		C.gtk_status_icon_new_from_pixbuf(fromGdkPixbuf(pixbuf))}
 }
 func StatusIconFromFile(filename string) *GtkStatusIcon {
 	ptr := C.CString(filename)
@@ -2728,7 +2736,7 @@ func StatusIconFromIconName(icon_name string) *GtkStatusIcon {
 //GtkStatusIcon *gtk_status_icon_new_from_gicon(GIcon *icon);
 
 func (v *GtkStatusIcon) SetFromPixbuf(pixbuf *gdkpixbuf.GdkPixbuf) {
-	C.gtk_status_icon_set_from_pixbuf(v.StatusIcon, pixbuf.Pixbuf)
+	C.gtk_status_icon_set_from_pixbuf(v.StatusIcon, fromGdkPixbuf(pixbuf))
 }
 func (v *GtkStatusIcon) SetFromFile(filename string) {
 	ptr := C.CString(filename)
@@ -2745,8 +2753,8 @@ func (v *GtkStatusIcon) SetFromIconName(icon_name string) {
 //GtkImageType gtk_status_icon_get_storage_type (GtkStatusIcon *status_icon);
 
 func (v *GtkStatusIcon) GetPixbuf() *gdkpixbuf.GdkPixbuf {
-	return &gdkpixbuf.GdkPixbuf{
-		C.gtk_status_icon_get_pixbuf(v.StatusIcon)}
+	return toGdkPixbuf(
+		C.gtk_status_icon_get_pixbuf(v.StatusIcon))
 }
 func (v *GtkStatusIcon) GetIconName() string {
 	return C.GoString(C.to_charptr(C.gtk_status_icon_get_icon_name(v.StatusIcon)))
@@ -3832,7 +3840,7 @@ func (v *GtkTextBuffer) GetSlice(start *GtkTextIter, end *GtkTextIter, include_h
 	return C.GoString(pchar)
 }
 func (v *GtkTextBuffer) InsertPixbuf(iter *GtkTextIter, pixbuf *gdkpixbuf.GdkPixbuf) {
-	C.gtk_text_buffer_insert_pixbuf(v.TextBuffer, &iter.TextIter, pixbuf.Pixbuf)
+	C.gtk_text_buffer_insert_pixbuf(v.TextBuffer, &iter.TextIter, fromGdkPixbuf(pixbuf))
 }
 
 // gtk_text_buffer_insert_child_anchor
@@ -7452,7 +7460,7 @@ func (v *GtkTooltip) SetText(text string) {
 	C.gtk_tooltip_set_text(v.Tooltip, C.to_gcharptr(ptr))
 }
 func (v *GtkTooltip) SetIcon(pixbuf *gdkpixbuf.GdkPixbuf) {
-	C.gtk_tooltip_set_icon(v.Tooltip, pixbuf.Pixbuf)
+	C.gtk_tooltip_set_icon(v.Tooltip, fromGdkPixbuf(pixbuf))
 }
 func (v *GtkTooltip) SetIconFromIconName(icon_name string, size GtkIconSize) {
 	ptr := C.CString(icon_name)

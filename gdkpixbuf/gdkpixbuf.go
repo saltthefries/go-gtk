@@ -36,6 +36,10 @@ type GdkPixbuf struct {
 	Pixbuf *C.GdkPixbuf
 }
 
+func FromUnsafe(p unsafe.Pointer) *GdkPixbuf {
+	return &GdkPixbuf{(*C.GdkPixbuf)(p)}
+}
+
 func PixbufFromFile(path string) (pixbuf *GdkPixbuf, err **glib.Error) {
 	var error *C.GError
 	ptr := C.CString(path)

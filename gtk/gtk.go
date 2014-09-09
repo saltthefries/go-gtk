@@ -764,15 +764,16 @@ static GtkSpinButton* to_GtkSpinButton(GtkWidget* w) { return GTK_SPIN_BUTTON(w)
 import "C"
 import (
 	"fmt"
-	"github.com/agl/go-gtk/gdk"
-	"github.com/agl/go-gtk/gdkpixbuf"
-	"github.com/agl/go-gtk/glib"
-	"github.com/agl/go-gtk/pango"
 	"log"
 	"reflect"
 	"runtime"
 	"strings"
 	"unsafe"
+
+	"github.com/agl/go-gtk/gdk"
+	"github.com/agl/go-gtk/gdkpixbuf"
+	"github.com/agl/go-gtk/glib"
+	"github.com/agl/go-gtk/pango"
 )
 
 func bool2gboolean(b bool) C.gboolean {
@@ -1735,12 +1736,6 @@ func (v *GtkMessageDialog) SetMarkup(markup string) {
 	ptr := C.CString(markup)
 	defer C.free_string(ptr)
 	C.gtk_message_dialog_set_markup(C.to_GtkMessageDialog(v.Widget), C.to_gcharptr(ptr))
-}
-func (v *GtkMessageDialog) SetImage(image WidgetLike) {
-	C.gtk_message_dialog_set_image(C.to_GtkMessageDialog(v.Widget), image.ToNative())
-}
-func (v *GtkMessageDialog) GetImage() *GtkImage {
-	return &GtkImage{GtkWidget{C.gtk_message_dialog_get_image(C.to_GtkMessageDialog(v.Widget))}}
 }
 
 // gtk_message_dialog_get_message_area //since 2.22
@@ -8437,8 +8432,8 @@ func (v *GtkWidget) SetMargin(margin int) {
 	m := C.gint(margin)
 	C.gtk_widget_set_margin_top(v.Widget, m)
 	C.gtk_widget_set_margin_bottom(v.Widget, m)
-	C.gtk_widget_set_margin_left(v.Widget, m)
-	C.gtk_widget_set_margin_right(v.Widget, m)
+	C.gtk_widget_set_margin_start(v.Widget, m)
+	C.gtk_widget_set_margin_end(v.Widget, m)
 }
 
 func (v *GtkWidget) SetMarginTop(margin int) {
@@ -8450,11 +8445,11 @@ func (v *GtkWidget) SetMarginBottom(margin int) {
 }
 
 func (v *GtkWidget) SetMarginLeft(margin int) {
-	C.gtk_widget_set_margin_left(v.Widget, C.gint(margin))
+	C.gtk_widget_set_margin_start(v.Widget, C.gint(margin))
 }
 
 func (v *GtkWidget) SetMarginRight(margin int) {
-	C.gtk_widget_set_margin_right(v.Widget, C.gint(margin))
+	C.gtk_widget_set_margin_end(v.Widget, C.gint(margin))
 }
 
 type GtkAlign int

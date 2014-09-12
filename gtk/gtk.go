@@ -10,7 +10,6 @@ package gtk
 #include <gdk/gdk.h>
 #ifdef _WIN32
 #include <windows.h>
-#else
 #endif
 #include <unistd.h>
 #include <stdlib.h>
@@ -759,6 +758,27 @@ static GtkFileFilter* to_GtkFileFilter(gpointer p) { return GTK_FILE_FILTER(p); 
 static GtkGrid* to_GtkGrid(GtkWidget* w) { return GTK_GRID(w); }
 static GtkCalendar* to_GtkCalendar(GtkWidget* w) { return GTK_CALENDAR(w); }
 static GtkSpinButton* to_GtkSpinButton(GtkWidget* w) { return GTK_SPIN_BUTTON(w); }
+
+// This is a hack to deal with GTK deprecating
+// gtk_widget_set_margin_{left|right} in the same release as the replacements
+// were introduced (3.12).
+
+#if GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 12
+static void _gtk_margin_left(GtkWidget *widget, gint value) {
+	gtk_widget_set_margin_left(widget, value);
+}
+static void _gtk_margin_right(GtkWidget *widget, gint value) {
+	gtk_widget_set_margin_right(widget, value);
+}
+#else
+static void _gtk_margin_left(GtkWidget *widget, gint value) {
+	gtk_widget_set_margin_start(widget, value);
+}
+static void _gtk_margin_right(GtkWidget *widget, gint value) {
+	gtk_widget_set_margin_end(widget, value);
+}
+#endif
+
 */
 // #cgo pkg-config: gtk+-3.0
 import "C"
@@ -8445,11 +8465,11 @@ func (v *GtkWidget) SetMarginBottom(margin int) {
 }
 
 func (v *GtkWidget) SetMarginLeft(margin int) {
-	C.gtk_widget_set_margin_start(v.Widget, C.gint(margin))
+	C._gtk_margin_left(v.Widget, C.gint(margin))
 }
 
 func (v *GtkWidget) SetMarginRight(margin int) {
-	C.gtk_widget_set_margin_end(v.Widget, C.gint(margin))
+	C._gtk_margin_right(v.Widget, C.gint(margin))
 }
 
 type GtkAlign int

@@ -8452,8 +8452,8 @@ func (v *GtkWidget) SetMargin(margin int) {
 	m := C.gint(margin)
 	C.gtk_widget_set_margin_top(v.Widget, m)
 	C.gtk_widget_set_margin_bottom(v.Widget, m)
-	C.gtk_widget_set_margin_start(v.Widget, m)
-	C.gtk_widget_set_margin_end(v.Widget, m)
+	C._gtk_margin_left(v.Widget, m)
+	C._gtk_margin_right(v.Widget, m)
 }
 
 func (v *GtkWidget) SetMarginTop(margin int) {

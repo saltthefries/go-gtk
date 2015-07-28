@@ -1,0 +1,12 @@
+Source: golang-github-agl-go-gtk-dev
+Maintainer: Jason Hernandez <jason@jasonhernandez.ch>
+Section: misc
+Priority: optional
+Standards-Version: 0.0~git20140914-1
+Build-Depends: debhelper (>= 9), golang-go (>= 1.4), dh-golang, libgtkspell3-3-dev, libgtksourceview2.0-dev, libgtk-3-0
+
+Package: golang-github-agl-go-gtk-dev
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Go-GTK3 libraries published by Adam Langley for use in Pond
+ Go-GTK is a library for binding Go with GTK+3

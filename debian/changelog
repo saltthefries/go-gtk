@@ -1,0 +1,5 @@
+golang-github-agl-go-gtk-dev (0.0~git20140914-1) UNRELEASED; urgency=low
+
+  * Initial release.
+
+ -- Jason Hernandez <jason@jasonhernandez.ch>  Sat, 25 Jul 2015 19:08:16 -0700

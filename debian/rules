@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+export DH_GOPKG := github.com/agl/go-gtk
+export DH_GOLANG_INSTALL_ALL := 1
+
+%:
+	dh $@ --buildsystem=golang --with=golang
+
+override_dh_auto_install:
+	dh_auto_install -O--buildsystem=golang
+	# remove extra license file
+	# rm $(CURDIR)/debian/golang-ed25519-dev/usr/share/gocode/src/github.com/agl/ed25519/LICENSE
